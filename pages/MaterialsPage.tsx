@@ -31,7 +31,7 @@ export const MaterialsPage: React.FC = () => {
 
   const pathData = location.state?.pathData as CareerPath | undefined;
 
-  const [type, setType] = useState<'cv' | 'coverLetter'>(
+  const [type] = useState<'cv' | 'coverLetter'>(
     location.state?.type === 'coverLetter' ? 'coverLetter' : 'cv'
   );
 
@@ -40,7 +40,9 @@ export const MaterialsPage: React.FC = () => {
   const [error, setError] = useState<string | null>(null);
   const [showPaywall, setShowPaywall] = useState(false);
 
-  const freeUsed = localStorage.getItem(FREE_USED_KEY) === 'true';
+  const [freeUsed, setFreeUsed] = useState(
+    localStorage.getItem(FREE_USED_KEY) === 'true'
+  );
 
   useEffect(() => {
     if (!sessionBackground?.background || !targetRole) {
@@ -51,7 +53,7 @@ export const MaterialsPage: React.FC = () => {
   const handleGenerate = async () => {
     if (!sessionBackground || !targetRole) return;
 
-    if (freeUsed && materials) {
+    if (freeUsed) {
       setShowPaywall(true);
       return;
     }
@@ -70,6 +72,7 @@ export const MaterialsPage: React.FC = () => {
 
       setMaterials(data);
       localStorage.setItem(FREE_USED_KEY, 'true');
+      setFreeUsed(true);
     } catch {
       setError('Generation failed. Please try again.');
     } finally {
@@ -94,10 +97,10 @@ export const MaterialsPage: React.FC = () => {
         <div className="mb-12 flex justify-between items-end">
           <div>
             <h1 className="text-3xl font-bold text-white">
-              Generate your {type === 'cv' ? 'CV' : 'Cover Letter'}
+              Generate your CV and Cover Letter
             </h1>
             <p className="text-slate-400 text-sm mt-2">
-              One free application set per role.
+              One free application set. Regeneration is paid.
             </p>
           </div>
 
@@ -108,7 +111,6 @@ export const MaterialsPage: React.FC = () => {
           </Link>
         </div>
 
-        {/* Preview */}
         {!materials && !loading && (
           <div className="max-w-2xl mx-auto bg-slate-900/50 border border-slate-800 rounded-xl">
             <div className="p-8 space-y-6">
@@ -152,7 +154,6 @@ export const MaterialsPage: React.FC = () => {
           </div>
         )}
 
-        {/* Loading */}
         {loading && (
           <div className="py-32 text-center">
             <div className="w-10 h-10 mx-auto border-2 border-slate-800 border-t-[#D4AF37] rounded-full animate-spin"></div>
@@ -162,7 +163,6 @@ export const MaterialsPage: React.FC = () => {
           </div>
         )}
 
-        {/* Error */}
         {error && (
           <div className="max-w-md mx-auto bg-red-900/10 border border-red-900/30 p-6 rounded text-center">
             <p className="text-red-400 text-sm mb-4">{error}</p>
@@ -172,28 +172,39 @@ export const MaterialsPage: React.FC = () => {
           </div>
         )}
 
-        {/* Output */}
         {materials && !loading && (
           <div className="max-w-4xl mx-auto space-y-10">
-            {materials.cv && (
-              <div className="bg-slate-900/30 border border-slate-800 p-8 rounded-xl">
-                <h2 className="text-xs uppercase tracking-widest font-bold mb-4">
-                  CV draft
-                </h2>
-                <pre className="whitespace-pre-wrap text-sm text-slate-300">
-                  {materials.cv.summary}
-                </pre>
-              </div>
-            )}
+            <div className="bg-slate-900/30 border border-slate-800 p-8 rounded-xl">
+              <h2 className="text-xs uppercase tracking-widest font-bold mb-4">
+                CV draft
+              </h2>
+              <pre className="whitespace-pre-wrap text-sm text-slate-300">
+                {materials.cv?.summary}
+              </pre>
+            </div>
 
-            {materials.coverLetter && (
-              <div className="bg-slate-900/30 border border-slate-800 p-8 rounded-xl">
-                <h2 className="text-xs uppercase tracking-widest font-bold mb-4">
-                  Cover letter
-                </h2>
-                <pre className="whitespace-pre-wrap text-sm text-slate-300">
-                  {materials.coverLetter}
-                </pre>
+            <div className="bg-slate-900/30 border border-slate-800 p-8 rounded-xl">
+              <h2 className="text-xs uppercase tracking-widest font-bold mb-4">
+                Cover letter
+              </h2>
+              <pre className="whitespace-pre-wrap text-sm text-slate-300">
+                {materials.coverLetter}
+              </pre>
+            </div>
+
+            {freeUsed && (
+              <div className="p-6 bg-slate-900/50 border border-slate-800 rounded-xl text-center">
+                <p className="text-xs text-slate-400 uppercase tracking-widest font-bold mb-3">
+                  Free application set used
+                </p>
+                <p className="text-sm text-slate-300 mb-6 max-w-md mx-auto">
+                  Regeneration and additional roles require an upgrade.
+                </p>
+                <Link to="/pricing">
+                  <Button variant="primary" className="text-xs px-10">
+                    Unlock more access
+                  </Button>
+                </Link>
               </div>
             )}
 
@@ -206,22 +217,17 @@ export const MaterialsPage: React.FC = () => {
                 onClick={handleRegenerate}
                 className="text-xs"
               >
-                Regenerate (Locked)
+                Regenerate
               </Button>
               <Link to="/explore">
-                <Button variant="primary" className="text-xs">
+                <Button variant="outline" className="text-xs">
                   Explore other roles
                 </Button>
               </Link>
             </div>
-
-            <p className="text-center text-[10px] text-slate-500 uppercase tracking-widest">
-              Regeneration and additional roles require a plan
-            </p>
           </div>
         )}
 
-        {/* Paywall */}
         {showPaywall && (
           <div className="fixed inset-0 bg-black/80 flex items-center justify-center z-50">
             <div className="bg-slate-900 border border-slate-800 p-8 rounded-xl max-w-sm text-center">
