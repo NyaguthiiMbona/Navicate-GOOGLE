@@ -40,9 +40,7 @@ export const MaterialsPage: React.FC = () => {
   const [error, setError] = useState<string | null>(null);
   const [showPaywall, setShowPaywall] = useState(false);
 
-  const [freeUsed, setFreeUsed] = useState(
-    localStorage.getItem(FREE_USED_KEY) === 'true'
-  );
+  const freeUsed = localStorage.getItem(FREE_USED_KEY) === 'true';
 
   useEffect(() => {
     if (!sessionBackground?.background || !targetRole) {
@@ -53,7 +51,7 @@ export const MaterialsPage: React.FC = () => {
   const handleGenerate = async () => {
     if (!sessionBackground || !targetRole) return;
 
-    if (freeUsed) {
+    if (freeUsed && materials) {
       setShowPaywall(true);
       return;
     }
@@ -72,7 +70,6 @@ export const MaterialsPage: React.FC = () => {
 
       setMaterials(data);
       localStorage.setItem(FREE_USED_KEY, 'true');
-      setFreeUsed(true);
     } catch {
       setError('Generation failed. Please try again.');
     } finally {
@@ -97,10 +94,10 @@ export const MaterialsPage: React.FC = () => {
         <div className="mb-12 flex justify-between items-end">
           <div>
             <h1 className="text-3xl font-bold text-white">
-              Generate your CV and Cover Letter
+              Generate your application
             </h1>
             <p className="text-slate-400 text-sm mt-2">
-              One free application set. Regeneration is paid.
+              One free application for one role.
             </p>
           </div>
 
@@ -124,7 +121,7 @@ export const MaterialsPage: React.FC = () => {
               {pathData?.transferableSkills && (
                 <div>
                   <p className="text-xs text-slate-500 uppercase tracking-widest mb-2">
-                    Key skills detected
+                    Key transferable skills
                   </p>
                   <div className="flex gap-2 flex-wrap">
                     {pathData.transferableSkills.slice(0, 3).map((skill, i) => (
@@ -139,12 +136,8 @@ export const MaterialsPage: React.FC = () => {
                 </div>
               )}
 
-              <Button
-                fullWidth
-                onClick={handleGenerate}
-                disabled={loading}
-              >
-                Generate free CV + cover letter
+              <Button fullWidth onClick={handleGenerate} disabled={loading}>
+                Generate free application
               </Button>
 
               <p className="text-[10px] text-slate-500 uppercase tracking-widest text-center">
@@ -174,37 +167,25 @@ export const MaterialsPage: React.FC = () => {
 
         {materials && !loading && (
           <div className="max-w-4xl mx-auto space-y-10">
-            <div className="bg-slate-900/30 border border-slate-800 p-8 rounded-xl">
-              <h2 className="text-xs uppercase tracking-widest font-bold mb-4">
-                CV draft
-              </h2>
-              <pre className="whitespace-pre-wrap text-sm text-slate-300">
-                {materials.cv?.summary}
-              </pre>
-            </div>
+            {materials.cv && (
+              <div className="bg-slate-900/30 border border-slate-800 p-8 rounded-xl">
+                <h2 className="text-xs uppercase tracking-widest font-bold mb-4">
+                  CV draft
+                </h2>
+                <pre className="whitespace-pre-wrap text-sm text-slate-300">
+                  {materials.cv.summary}
+                </pre>
+              </div>
+            )}
 
-            <div className="bg-slate-900/30 border border-slate-800 p-8 rounded-xl">
-              <h2 className="text-xs uppercase tracking-widest font-bold mb-4">
-                Cover letter
-              </h2>
-              <pre className="whitespace-pre-wrap text-sm text-slate-300">
-                {materials.coverLetter}
-              </pre>
-            </div>
-
-            {freeUsed && (
-              <div className="p-6 bg-slate-900/50 border border-slate-800 rounded-xl text-center">
-                <p className="text-xs text-slate-400 uppercase tracking-widest font-bold mb-3">
-                  Free application set used
-                </p>
-                <p className="text-sm text-slate-300 mb-6 max-w-md mx-auto">
-                  Regeneration and additional roles require an upgrade.
-                </p>
-                <Link to="/pricing">
-                  <Button variant="primary" className="text-xs px-10">
-                    Unlock more access
-                  </Button>
-                </Link>
+            {materials.coverLetter && (
+              <div className="bg-slate-900/30 border border-slate-800 p-8 rounded-xl">
+                <h2 className="text-xs uppercase tracking-widest font-bold mb-4">
+                  Cover letter
+                </h2>
+                <pre className="whitespace-pre-wrap text-sm text-slate-300">
+                  {materials.coverLetter}
+                </pre>
               </div>
             )}
 
@@ -212,19 +193,19 @@ export const MaterialsPage: React.FC = () => {
               <Button variant="outline" onClick={() => window.print()} className="text-xs">
                 Save as PDF
               </Button>
-              <Button
-                variant="secondary"
-                onClick={handleRegenerate}
-                className="text-xs"
-              >
-                Regenerate
+              <Button variant="secondary" onClick={handleRegenerate} className="text-xs">
+                Regenerate and polish
               </Button>
               <Link to="/explore">
-                <Button variant="outline" className="text-xs">
+                <Button variant="primary" className="text-xs">
                   Explore other roles
                 </Button>
               </Link>
             </div>
+
+            <p className="text-center text-[10px] text-slate-500 uppercase tracking-widest">
+              Regeneration and additional roles require a plan
+            </p>
           </div>
         )}
 
@@ -232,14 +213,14 @@ export const MaterialsPage: React.FC = () => {
           <div className="fixed inset-0 bg-black/80 flex items-center justify-center z-50">
             <div className="bg-slate-900 border border-slate-800 p-8 rounded-xl max-w-sm text-center">
               <h3 className="text-white font-bold mb-3">
-                Regeneration is a paid feature
+                Polish and regenerate your application
               </h3>
               <p className="text-sm text-slate-400 mb-6">
-                Each regeneration creates a new tailored draft.
+                Pay once to refine this role as many times as you need.
               </p>
               <div className="flex gap-3 justify-center">
                 <Link to="/pricing">
-                  <Button className="text-xs">View plans</Button>
+                  <Button className="text-xs">Unlock this role</Button>
                 </Link>
                 <Button
                   variant="outline"
