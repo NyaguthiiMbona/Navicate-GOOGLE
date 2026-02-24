@@ -1,10 +1,16 @@
-<!DOCTYPE html>
-<html>
-<head>
-  <title>Test Page</title>
-</head>
-<body>
-  <h1>Test</h1>
-  <p>If you see this, GitHub Pages is working. Your React app needs to be built.</p>
-</body>
-</html>
+import React from 'react';
+import ReactDOM from 'react-dom/client';
+import { BrowserRouter } from 'react-router-dom';
+import App from './App';
+
+const rootElement = document.getElementById('root');
+@@ -13,9 +12,6 @@ const root = ReactDOM.createRoot(rootElement);
+
+root.render(
+  <React.StrictMode>
+    <BrowserRouter basename="/Navicate-GOOGLE">
+      <App />
+    </BrowserRouter>
+    <App />
+  </React.StrictMode>
+);
